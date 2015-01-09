@@ -1,10 +1,10 @@
-(ns malachite-migrations.core)
+(ns malachite-migrations.core
+  (:require [clj-time.core :as time]
+            [clj-time.coerce :as coerce]
+            [malachite-migrations.files :refer :all :as files]))
 
-(defn- make-file
-  "Writes the scaffolding of a migration file to disc"
-  [name]
-    true)
 (defn generate-migration
   "Generates a migration file "
-  []
-  )
+  [name]
+  (let [fpath (files/make-file name)]
+    fpath))
