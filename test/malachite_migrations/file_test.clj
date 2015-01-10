@@ -1,6 +1,5 @@
 (ns malachite-migrations.file-test
-  (:use clojure.java.io
-        clojure.string)
+  (:use clojure.java.io)
   (:require [expectations :refer :all]
             [malachite-migrations.files :refer :all :as files]
             [clj-time.core :as time]

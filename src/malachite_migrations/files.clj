@@ -1,7 +1,7 @@
 (ns malachite-migrations.files
-  (:use clojure.java.io
-        clojure.string)
+  (:use clojure.java.io)
   (:require [clj-time.core :as time]
+            [clojure.string :as str]
             [clj-time.coerce :as coerce]))
 
 (defn- current-timestamp
@@ -12,8 +12,8 @@
 (defn grab-timestamp
   "Strips the timestamp from a migration file"
   [fpath]
-  (let [fname (last (split fpath #"/"))
-        timestamp (first (split fname #"_"))]
+  (let [fname (last (str/split fpath #"/"))
+        timestamp (first (str/split fname #"_"))]
         (BigInteger. timestamp)))
 
 (defn- write-file
