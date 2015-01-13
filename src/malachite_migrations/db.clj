@@ -38,7 +38,7 @@
 
 (defn create-table-sql 
   "Generates the sql string to create a table"
-  [table-name & columns]
+  [table-name columns]
   (let [base-sql-str (str "CREATE TABLE IF NOT EXISTS " table-name " (")]
     ; loop over all the columns, accumulating the SQL string as we go
     (add-cols-to-sql columns base-sql-str)))
@@ -46,7 +46,6 @@
 (defn create-table
   "Creates a table on the DB specified in the config hash"
   [table-name & columns]
-  (apply println columns))
-  ; (db/execute!
-  ;   (:url db-config)
-  ;   [(create-table-sql table-name columns)]))
+   (db/execute!
+     (:url db-config)
+     [(create-table-sql table-name columns)]))
