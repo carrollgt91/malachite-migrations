@@ -5,7 +5,9 @@
     :url "jdbc:postgresql://localhost/test-migrations"
   })
 
-(defn- remove-from-end [s end]
+(defn- remove-from-end
+  "chops the string end off of the string s if end is at the end of s"
+  [s end]
   (if (.endsWith s end)
     (.substring s 0 (- (count s)
                        (count end)))))
