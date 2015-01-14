@@ -3,6 +3,9 @@
   (:require [expectations :refer :all]))
 
 
+(expect (.contains (create-table-sql "users" [[:id :integer] [:name :string]]) 
+  "id INTEGER"))
+
 (expect (.contains (create-table-sql "users" [[:id :string] [:name :string]])
   "CREATE TABLE IF NOT EXISTS users"))
 
@@ -13,5 +16,5 @@
   "name VARCHAR(64)"))
 
 (expect (create-table "users" 
-                      [:id :string]
+                      [:id :integer]
                       [:name :string]))

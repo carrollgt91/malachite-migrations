@@ -21,7 +21,9 @@
         sql-str (str base-sql-str "\n\t" col-name)]
     (cond
       (= col-type :string)
-        (str sql-str " VARCHAR(64),"))))
+        (str sql-str " VARCHAR(64),")
+      (= col-type :integer)
+        (str sql-str " INTEGER,"))))
 
 (defn- add-cols-to-sql
   "Adds the columns to the given CREATE TABLE sql string"
