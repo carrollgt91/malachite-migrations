@@ -41,6 +41,13 @@
     ; loop over all the columns, accumulating the SQL string as we go
     (add-cols-to-sql columns base-sql-str)))
 
+(defn drop-table 
+  "Drops table with a given table name"
+  [table-name]
+  (db/execute!
+    (:url db-config)
+    [(str "DROP TABLE IF EXISTS " table-name ";")]))
+
 (defn create-table
   "Creates a table on the DB specified in the config hash"
   [table-name & columns]
