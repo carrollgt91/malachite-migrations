@@ -1,4 +1,4 @@
-(ns malachite-migrations.file-test
+(ns malachite-migrations.files-test
   (:use clojure.java.io)
   (:require [expectations :refer :all]
             [malachite-migrations.files :refer :all :as files]

@@ -16,13 +16,18 @@
         timestamp (first (str/split fname #"_"))]
         (BigInteger. timestamp)))
 
+(defn write-to-file
+  "Writes the scaffolding of the migrations file to disc"
+  [fpath contents]
+  (with-open [writer (writer fpath)]
+    (.write writer contents))
+  fpath)
+
 (defn- write-file
   "Writes the scaffolding of the migrations file to disc"
   [name]
     (let [fpath (str "migrations/" (current-timestamp) "_" name ".clj")]
-        (with-open [writer (writer fpath)]
-          (.write writer "Testing the writer yo"))
-        fpath))
+      (write-to-file fpath "")))
 
 (defn- create-migrations-dir
   "Creates the migrations directory"
