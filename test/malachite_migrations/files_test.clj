@@ -13,6 +13,8 @@
 (let [fpath (files/make-file "test_blah")]
   ; Should create a file that contains the name
   (expect (.contains fpath "_test_blah.clj"))
+  ; Should be housed under the migrations/ directory
+  (expect (.contains fpath "migrations"))
   ; Filename should have timestamp that is before the current timestamp
   (expect (> (current-timestamp) (files/grab-timestamp fpath)))
   (delete-file fpath))

@@ -9,12 +9,12 @@
   [table-name]
   (:exists (first (db/query
               (:url db-config)
-              ["SELECT EXISTS(
+              [(str "SELECT EXISTS(
                   SELECT * 
                   FROM information_schema.tables 
                   WHERE 
-                    table_name = 'users'
-                );"]))))
+                    table_name = '" table-name "'
+                );")]))))
 
 ; SQL Generation Tests
 (expect (.contains (create-table-sql "users" [[:id :integer] [:name :string]]) 
