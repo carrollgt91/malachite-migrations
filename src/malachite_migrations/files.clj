@@ -39,4 +39,4 @@
   [name]
     (if (.exists (file "migrations/"))
         (write-file name)
-        (create-migrations-dir)))
+        (do (create-migrations-dir) (write-file name))))
