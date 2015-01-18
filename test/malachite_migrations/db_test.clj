@@ -33,8 +33,8 @@
 
 ; DB Integration Tests
 (expect (create-table "users" 
-                      [:id :integer]
-                      [:name :string]))
+                      [[:id :integer]
+                      [:name :string]]))
 
 (expect (table-exists? "users") true)
 

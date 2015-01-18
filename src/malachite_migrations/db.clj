@@ -50,7 +50,7 @@
 
 (defn create-table
   "Creates a table on the DB specified in the config hash"
-  [table-name & columns]
+  [table-name columns]
    (db/execute!
      (:url db-config)
      [(create-table-sql table-name columns)]))
