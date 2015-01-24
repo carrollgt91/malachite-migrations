@@ -34,6 +34,11 @@
         sql-str (remove-from-end naive-sql-str ",")]
     (str sql-str ");")))
 
+(defn check-table-exists
+  "Checks if a table with a given tablename exists"
+  [table-name]
+  table-name)
+
 (defn create-table-sql 
   "Generates the sql string to create a table"
   [table-name columns]
@@ -41,6 +46,7 @@
     ; loop over all the columns, accumulating the SQL string as we go
     (add-cols-to-sql columns base-sql-str)))
 
+; TODO- add ! to these functions which have side-effects
 (defn drop-table 
   "Drops table with a given table name"
   [table-name]
@@ -48,6 +54,7 @@
     (:url db-config)
     [(str "DROP TABLE IF EXISTS " table-name ";")]))
 
+; TODO- add ! to these functions which have side-effects
 (defn create-table
   "Creates a table on the DB specified in the config hash"
   [table-name columns]

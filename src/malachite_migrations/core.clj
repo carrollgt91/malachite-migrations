@@ -7,6 +7,7 @@
   "Generates a migration file for creating a table"
   [fname table-name columns]
   (let [migration-code (str "(create-table \"" table-name "\" " columns ")")]
+    (println migration-code)
     (files/write-to-file fname migration-code)))
 
 (defn generate-migration
@@ -19,8 +20,11 @@
                                       [:name :string])
    will generate a migration which creates a user table with two fields on it"
   [name table-name & info]
-  (let [fpath (files/make-file name)]
+  (let [fpath (files/make-file name)
+        type (first info)]
+    (when-not (keyword? type)
+      (throw (IllegalArgumentException. "Migration type must be a symbol")))
     (cond 
-      (= (first info) :create-table)
+      (= type :create-table)
       (write-create-migration fpath table-name (vec (rest info))))
     fpath))
