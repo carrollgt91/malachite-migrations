@@ -14,6 +14,7 @@
   "Grabs all migration files"
   []
   (map #(.getPath %) (rest (file-seq (as-file "migrations/")))))
+
 (defn- pending-migrations
   "Grabs all migration file paths which have not yet been run by checking
    for the most recently ran migration's timestamp in the migrations table
@@ -54,6 +55,7 @@
   (write-migrations-table!)
   (let [ct (or (current-timestamp) 0)
         pending-migrations (pending-migrations (migrations))]
+    (load-file (first pending-migrations))
     (write-timestamp! (get-timestamp (first pending-migrations)))))
 
 (defn rollback!
