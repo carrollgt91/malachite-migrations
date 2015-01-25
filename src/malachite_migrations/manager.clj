@@ -10,6 +10,7 @@
   (when-not (table-exists? "malachite_migrations")
     (do (create-table "malachite_migrations" [[:timestamp :bigint]])
         nil)))
+
 (defn- migrations
   "Grabs all migration files"
   []
@@ -55,9 +56,12 @@
   (write-migrations-table!)
   (let [ct (or (current-timestamp) 0)
         pending-migrations (pending-migrations (migrations))]
-    (doseq [mig pending-migrations]
-      (load-file mig)
-      (write-timestamp! (get-timestamp mig)))))
+    (if-not (empty? pending-migrations)
+      ; run all migrations; if they succeed, write the timestamp to the database
+      (doseq [mig pending-migrations]
+        (load-file mig)
+        (write-timestamp! (get-timestamp mig)))
+      (println "No pending migrations."))))
 
 (defn rollback!
   "Undoes the latest migration and removes that timestamp from the database"

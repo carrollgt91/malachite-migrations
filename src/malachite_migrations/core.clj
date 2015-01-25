@@ -1,7 +1,9 @@
 (ns malachite-migrations.core
   (:require [clj-time.core :as time]
             [clj-time.coerce :as coerce]
-            [malachite-migrations.files :refer :all :as files]))
+            [malachite-migrations.files :refer :all :as files]
+            [malachite-migrations.db :refer :all]
+            [malachite-migrations.manager :refer :all]))
 
 (defn write-create-migration
   "Generates a migration file for creating a table"

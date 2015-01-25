@@ -5,6 +5,9 @@
             [malachite-migrations.db :refer :all]
             [malachite-migrations.core :refer :all]))
 
+;; When there are no migrations, migrate should return nil and not fail
+(expect nil (migrate!))
+
 (let [fpath (generate-migration "create_users"
                                 "users_mng"
                                 :create-table
