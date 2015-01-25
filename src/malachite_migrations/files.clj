@@ -9,15 +9,15 @@
   []
   (coerce/to-long (time/now)))
 
-(defn grab-timestamp
+(defn get-timestamp
   "Strips the timestamp from a migration file"
   [fpath]
   (let [fname (last (str/split fpath #"/"))
         timestamp (first (str/split fname #"_"))]
-        (BigInteger. timestamp)))
+        (BigDecimal. timestamp)))
 
 (defn write-to-file
-  "Writes the scaffolding of the migrations file to disc"
+  "Writes contents to the file specified at fpath"
   [fpath contents]
   (with-open [writer (writer fpath)]
     (.write writer contents))

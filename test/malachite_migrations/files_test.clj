@@ -16,5 +16,5 @@
   ; Should be housed under the migrations/ directory
   (expect (.contains fpath "migrations"))
   ; Filename should have timestamp that is before the current timestamp
-  (expect (> (current-timestamp) (files/grab-timestamp fpath)))
+  (expect (> (current-timestamp) (files/get-timestamp fpath)))
   (delete-file fpath))

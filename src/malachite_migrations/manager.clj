@@ -1,13 +1,25 @@
 (ns malachite-migrations.manager
   (:require [malachite-migrations.db :refer :all]
+            [malachite-migrations.files :refer :all]
+            [clojure.java.io :refer :all]
             [clojure.java.jdbc :as db]))
 
 (defn- write-migrations-table!
   "Creates the malachite-migrations table on the database if it doesn't exist"
   []
   (when-not (table-exists? "malachite_migrations")
-    (do (create-table "malachite_migrations" [[:timestamp :integer]])
+    (do (create-table "malachite_migrations" [[:timestamp :bigint]])
         nil)))
+(defn- migrations
+  "Grabs all migration files"
+  []
+  (map #(.getPath %) (rest (file-seq (as-file "migrations/")))))
+(defn- pending-migrations
+  "Grabs all migration file paths which have not yet been run by checking
+   for the most recently ran migration's timestamp in the migrations table
+   and returning all migrations which have a timestamp which is greater"
+  [migration-files]
+  (filter #(> (get-timestamp %) 1345) migration-files))
 
 (defn delete-timestamp!
   "Removes a given timestamp from the migrations database table"
@@ -40,7 +52,9 @@
   "Runs all migrations created after the latest timestamp in the database"
   []
   (write-migrations-table!)
-  (let []))
+  (let [ct (or (current-timestamp) 0)
+        pending-migrations (pending-migrations (migrations))]
+    (write-timestamp! (get-timestamp (first pending-migrations)))))
 
 (defn rollback!
   "Undoes the latest migration and removes that timestamp from the database"
