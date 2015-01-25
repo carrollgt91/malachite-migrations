@@ -23,7 +23,9 @@
       (= col-type :string)
         (str sql-str " VARCHAR(64),")
       (= col-type :integer)
-        (str sql-str " INTEGER,"))))
+        (str sql-str " INTEGER,")
+      (= col-type :bigint)
+        (str sql-str " BIGINT,"))))
 
 (defn- add-cols-to-sql
   "Adds the columns to the given CREATE TABLE sql string"
