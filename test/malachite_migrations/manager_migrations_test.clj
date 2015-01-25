@@ -19,8 +19,28 @@
   (expect (number? ct))
   (delete-timestamp! ct))
 
+(let [fpath (generate-migration "create_users_mig_mng"
+                                "users_mig_mng"
+                                :create-table
+                                [:id :integer]
+                                [:name :string])
+      fpath1 (generate-migration "create_users_mig_mng1"
+                                "users_mig_mng1"
+                                :create-table
+                                [:id :integer]
+                                [:name :string])]
+  (migrate!)
+  ;; migrate! should create both tables
+  (expect (table-exists? "users_mig_mng"))
+  (expect (table-exists? "users_mig_mng1"))
+  ;; clean up the files generated 
+  (delete-file fpath)
+  (delete-file fpath1))
+  (drop-table "malachite_migrations")
+
 (defn clean-up-mng-test
   {:expectations-options :after-run}
   []
-  (drop-table "malachite_migrations")
-  (drop-table "users_mng"))
+  (drop-table "users_mng")
+  (drop-table "users_mig_mng")
+  (drop-table "users_mig_mng1"))

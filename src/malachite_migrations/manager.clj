@@ -55,8 +55,9 @@
   (write-migrations-table!)
   (let [ct (or (current-timestamp) 0)
         pending-migrations (pending-migrations (migrations))]
-    (load-file (first pending-migrations))
-    (write-timestamp! (get-timestamp (first pending-migrations)))))
+    (doseq [mig pending-migrations]
+      (load-file mig)
+      (write-timestamp! (get-timestamp mig)))))
 
 (defn rollback!
   "Undoes the latest migration and removes that timestamp from the database"
