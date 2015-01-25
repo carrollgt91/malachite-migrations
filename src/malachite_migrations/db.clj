@@ -34,10 +34,17 @@
         sql-str (remove-from-end naive-sql-str ",")]
     (str sql-str ");")))
 
-(defn check-table-exists
+(defn table-exists?
   "Checks if a table with a given tablename exists"
   [table-name]
-  table-name)
+  (:exists (first (db/query
+              (:url db-config)
+              [(str "SELECT EXISTS(
+                  SELECT * 
+                  FROM information_schema.tables 
+                  WHERE 
+                    table_name = '" table-name "'
+                );")]))))
 
 (defn create-table-sql 
   "Generates the sql string to create a table"

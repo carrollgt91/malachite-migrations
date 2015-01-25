@@ -3,19 +3,6 @@
   (:require [expectations :refer :all]
             [clojure.java.jdbc :as db]))
 
-; Helpers
-(defn- table-exists?
-  "Uses a sql query to check if a table exists"
-  [table-name]
-  (:exists (first (db/query
-              (:url db-config)
-              [(str "SELECT EXISTS(
-                  SELECT * 
-                  FROM information_schema.tables 
-                  WHERE 
-                    table_name = '" table-name "'
-                );")]))))
-
 ; SQL Generation Tests
 (expect (.contains (create-table-sql "users" [[:id :integer] [:name :string]]) 
   "id INTEGER"))
