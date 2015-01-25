@@ -15,12 +15,13 @@
   (expect (.contains contents "(create-table "))
   (expect (.contains contents "[:id :integer]"))
   (expect (.contains contents "[:name :string]"))
+  (delete-file fpath)
 )
 
 ; generating a migration without specifying the type of migration should
 ; throw an error and not generate a file
 
-(expect IllegalArgumentException
+(expect AssertionError 
         (generate-migration "create_users"
                             "users" 
                             [:id :integer]

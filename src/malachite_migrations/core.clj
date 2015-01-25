@@ -20,10 +20,9 @@
                                       [:name :string])
    will generate a migration which creates a user table with two fields on it"
   [name table-name & info]
+  {:pre [(keyword? (first info))]}
   (let [fpath (files/make-file name)
         type (first info)]
-    (when-not (keyword? type)
-      (throw (IllegalArgumentException. "Migration type must be a symbol")))
     (cond 
       (= type :create-table)
       (write-create-migration fpath table-name (vec (rest info))))
