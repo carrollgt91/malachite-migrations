@@ -39,11 +39,11 @@
   ;; clean up the files generated 
   (delete-file fpath)
   (delete-file fpath1))
-  (drop-table "malachite_migrations")
+  (drop-table! "malachite_migrations")
 
 (defn clean-up-mng-test
   {:expectations-options :after-run}
   []
-  (drop-table "users_mng")
-  (drop-table "users_mig_mng")
-  (drop-table "users_mig_mng1"))
+  (drop-table! "users_mng")
+  (drop-table! "users_mig_mng")
+  (drop-table! "users_mig_mng1"))
