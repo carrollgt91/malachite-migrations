@@ -16,6 +16,10 @@
   []
   (map #(.getPath %) (rest (file-seq (as-file "migrations/")))))
 
+(defn- migration
+  [timestamp]
+  (first (filter #(.startsWith % (str "migrations/" timestamp)) (migrations))))
+
 ;; TODO: Implement grabbing latest timestamp from db, right now hardcoded
 (defn- pending-migrations
   "Grabs all migration file paths which have not yet been run by checking
@@ -67,8 +71,13 @@
 (defn rollback!
   "Undoes the latest migration and removes that timestamp from the database"
   []
-  ()
-  nil)
+  (let [ct (current-timestamp)]
+    (cond
+     (nil? ct)
+     nil
+     (not (nil? ct))
+     (do ((load-file (migration ct)) :down)
+         (delete-timestamp! ct)))))
 
 (defn migrate-to!
   "Runs all migrations between the latest timestamp in the d
