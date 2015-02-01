@@ -8,7 +8,7 @@
   "Creates the malachite-migrations table on the database if it doesn't exist"
   []
   (when-not (table-exists? "malachite_migrations")
-    (do (create-table "malachite_migrations" [[:timestamp :bigint]])
+    (do (create-table! "malachite_migrations" [[:timestamp :bigint]])
         nil)))
 
 (defn- migrations
@@ -16,6 +16,7 @@
   []
   (map #(.getPath %) (rest (file-seq (as-file "migrations/")))))
 
+;; TODO: Implement grabbing latest timestamp from db, right now hardcoded
 (defn- pending-migrations
   "Grabs all migration file paths which have not yet been run by checking
    for the most recently ran migration's timestamp in the migrations table
@@ -59,13 +60,14 @@
     (if-not (empty? pending-migrations)
       ; run all migrations; if they succeed, write the timestamp to the database
       (doseq [mig pending-migrations]
-        (load-file mig)
+        ((load-file mig) :up)
         (write-timestamp! (get-timestamp mig)))
       (println "No pending migrations."))))
 
 (defn rollback!
   "Undoes the latest migration and removes that timestamp from the database"
   []
+  ()
   nil)
 
 (defn migrate-to!

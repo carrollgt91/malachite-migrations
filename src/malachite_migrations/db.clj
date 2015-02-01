@@ -55,18 +55,28 @@
     ; loop over all the columns, accumulating the SQL string as we go
     (add-cols-to-sql columns base-sql-str)))
 
-; TODO- add ! to these functions which have side-effects
-(defn drop-table 
+(defn drop-table! 
   "Drops table with a given table name"
   [table-name]
   (db/execute!
     (:url db-config)
     [(str "DROP TABLE IF EXISTS " table-name ";")]))
 
-; TODO- add ! to these functions which have side-effects
-(defn create-table
+(defn create-table!
   "Creates a table on the DB specified in the config hash"
   [table-name columns]
    (db/execute!
      (:url db-config)
      [(create-table-sql table-name columns)]))
+
+(defn create-table
+  "Generates a function which chooses between the creation
+   and destruction of a table depending on whether :up or :down
+   is passed to it"
+  [table-name columns]
+  (fn [symbol]
+    (cond
+     (= :up symbol)
+       (create-table! table-name columns)
+     (= :down symbol)
+       (drop-table! table-name))))

@@ -19,12 +19,12 @@
 (expect (table-exists? "users_db") false)
 
 ; DB Integration Tests
-(expect (create-table "users_db" 
+(expect (create-table! "users_db" 
                       [[:id :integer]
                       [:name :string]]))
 
 (expect (table-exists? "users_db") true)
 
-(expect (drop-table "users_db"))
+(expect (drop-table! "users_db"))
 
 (expect (table-exists? "users_db") false)
