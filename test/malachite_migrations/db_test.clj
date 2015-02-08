@@ -22,8 +22,12 @@
 (expect (create-table! "users_db" 
                       [[:id :integer]
                       [:name :string]]))
-
 (expect (table-exists? "users_db") true)
+(expect (column-exists? "users_db" "id") true)
+(expect (column-exists? "users_db" "name") true)
+
+(expect (add-column! "users_db" [:email :string]))
+(expect (column-exists? "users_db" "email") true)
 
 (expect (drop-table! "users_db"))
 
