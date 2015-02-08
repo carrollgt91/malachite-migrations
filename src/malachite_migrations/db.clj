@@ -99,6 +99,13 @@
        (create-table! table-name columns)
      (= :down symbol)
        (drop-table! table-name))))
+(defn remove-column!
+  "Removes a column from the table with table-name on the
+   DB specified in the config hash"
+  [table-name column-name]
+  (db/execute!
+   (:url db-config)
+   [(str "ALTER TABLE " table-name " DROP COLUMN " (name column-name))]))
 
 (defn add-column!
   "Adds a column to the table with table-name on the DB
@@ -118,4 +125,4 @@
      (= :up symbol)
        (add-column! table-name column)
      (= :down symbol)
-       nil)))
+       (remove-column! table-name (first column)))))
