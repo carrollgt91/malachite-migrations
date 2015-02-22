@@ -1,10 +1,12 @@
 (ns malachite-migrations.manager-timestamp-test
   (:use clojure.java.io)
   (:require [expectations :refer :all]
+            [malachite-migrations.helpers :refer :all]
             [malachite-migrations.manager :refer :all]
             [malachite-migrations.db :refer :all]
             [malachite-migrations.core :refer :all]))
 
+(delete-all-migrations!)
 ;; Test reading and writing of timestamps to the migrations table
 (write-timestamp! 100)
 (write-timestamp! 101)

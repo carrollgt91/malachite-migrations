@@ -1,7 +1,8 @@
 (ns malachite-migrations.db-test
   (:use malachite-migrations.db)
   (:require [expectations :refer :all]
-            [clojure.java.jdbc :as db]))
+            [clojure.java.jdbc :as db]
+            [malachite-migrations.helpers :refer :all]))
 
 ; SQL Generation Tests
 (expect (.contains (create-table-sql "users_db" [[:id :integer] [:name :string]]) 

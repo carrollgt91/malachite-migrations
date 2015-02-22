@@ -1,9 +1,13 @@
 (ns malachite-migrations.manager-migrations-test
   (:use clojure.java.io)
   (:require [expectations :refer :all]
+            [malachite-migrations.helpers :refer :all]
             [malachite-migrations.manager :refer :all]
             [malachite-migrations.db :refer :all]
             [malachite-migrations.core :refer :all]))
+
+
+(write-migrations-table!)
 
 ;; When there are no migrations, migrate should return nil and not fail
 (expect nil (migrate!))
@@ -39,7 +43,6 @@
   ;; clean up the files generated 
   (delete-file fpath)
   (delete-file fpath1))
-  (drop-table! "malachite_migrations")
 
 (defn clean-up-mng-test
   {:expectations-options :after-run}

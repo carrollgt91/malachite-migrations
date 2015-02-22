@@ -1,5 +1,6 @@
 (ns malachite-migrations.db
     (:require [clojure.java.jdbc :as db]))
+
 (def db-config 
   {
     :url "jdbc:postgresql://localhost/test-migrations"
@@ -36,18 +37,6 @@
                         columns)
         sql-str (remove-from-end naive-sql-str ",")]
     (str sql-str ");")))
-
-(defn table-exists?
-  "Checks if a table with a given tablename exists"
-  [table-name]
-  (:exists (first (db/query
-              (:url db-config)
-              [(str "SELECT EXISTS(
-                  SELECT * 
-                  FROM information_schema.tables 
-                  WHERE 
-                    table_name = '" table-name "'
-                );")]))))
 
 (defn column-exists?
   "Checks if a table with a given tablename exists"
