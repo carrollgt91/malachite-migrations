@@ -18,12 +18,13 @@
                                 [:id :integer]
                                 [:name :string])] 
   (migrate!)
-  ;; (expect (table-exists? "users_mng"))
+  (expect (=  (count (pending-migrations)) 0))
   (delete-file fpath))
 
 (let [ct (current-timestamp)]
 ;  the current timestamp should be a number
   (expect (number? ct))
+  (expect (> ct 0))
   (delete-timestamp! ct))
 
 (let [fpath (generate-migration "create_users_mig_mng"
@@ -38,9 +39,11 @@
                                 [:name :string])]
   (migrate!)
   ;; migrate! should create both tables
-  ;(expect (table-exists? "users_mig_mng"))
-  ;(expect (table-exists? "users_mig_mng1"))
-  ;; clean up the files generated 
+(let [ct (current-timestamp)]
+;  the current timestamp should be a number
+  (expect (number? ct))
+  (expect (> ct 0)))
+  (delete-all-migrations!)
   (delete-file fpath)
   (delete-file fpath1))
 

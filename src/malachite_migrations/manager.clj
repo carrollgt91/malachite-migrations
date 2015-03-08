@@ -4,6 +4,17 @@
             [clojure.java.io :refer :all]
             [clojure.java.jdbc :as db]))
 
+(defn current-timestamp
+  "Grabs the latest timestamp in the database"
+  []
+  (or 
+   (:timestamp
+    (first
+     (db/query
+      (:url db-config)
+      ["SELECT * FROM malachite_migrations
+        ORDER BY timestamp DESC LIMIT 1;"])))
+   0))
 (defn- migrations
   "Grabs all migration files"
   []
@@ -14,12 +25,14 @@
   (first (filter #(.startsWith % (str "migrations/" timestamp)) (migrations))))
 
 ;; TODO: Implement grabbing latest timestamp from db, right now hardcoded
-(defn- pending-migrations
+(defn pending-migrations
   "Grabs all migration file paths which have not yet been run by checking
    for the most recently ran migration's timestamp in the migrations table
    and returning all migrations which have a timestamp which is greater"
-  [migration-files]
-  (filter #(> (get-timestamp %) 1345) migration-files))
+  []
+  (filter #(> (get-timestamp %)
+              (or (current-timestamp) 0))
+          (migrations)))
 
 (defn delete-timestamp!
   "Removes a given timestamp from the migrations database table"
@@ -35,21 +48,11 @@
    (:url db-config)
    ["INSERT INTO malachite_migrations (timestamp) VALUES(?);" timestamp]))
 
-(defn current-timestamp
-  "Grabs the latest timestamp in the database"
-  []
-  (:timestamp
-    (first
-     (db/query
-      (:url db-config)
-      ["SELECT * FROM malachite_migrations
-        ORDER BY timestamp DESC LIMIT 1;"]))))
-
 (defn migrate!
   "Runs all migrations created after the latest timestamp in the database"
   []
   (let [ct (or (current-timestamp) 0)
-        pending-migrations (pending-migrations (migrations))]
+        pending-migrations (pending-migrations)]
     (if-not (empty? pending-migrations)
       ; run all migrations; if they succeed, write the timestamp to the database
       (doseq [mig pending-migrations]

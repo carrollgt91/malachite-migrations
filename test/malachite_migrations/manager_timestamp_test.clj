@@ -20,4 +20,4 @@
 
 (delete-timestamp! 100)
 
-(expect (nil? (current-timestamp)))
+(expect (= 0 (current-timestamp)))
