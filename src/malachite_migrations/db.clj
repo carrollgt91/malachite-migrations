@@ -1,10 +1,10 @@
 (ns malachite-migrations.db
     (:require [clojure.java.jdbc :as db]))
 
-(def db-config 
-  {
-    :url "jdbc:postgresql://localhost/test-migrations"
-  })
+;; (def db-config 
+;;   {
+;;    :url "jdbc:postgresql://localhost/test-migrations"
+;;    })
 
 (defn- remove-from-end
   "chops the string end off of the string s if end is at the end of s"
@@ -40,7 +40,7 @@
 
 (defn column-exists?
   "Checks if a table with a given tablename exists"
-  [table-name col-name]
+  [db-config table-name col-name]
   (not
    (nil?
     (first
@@ -65,14 +65,14 @@
 
 (defn drop-table! 
   "Drops table with a given table name"
-  [table-name]
+  [db-config table-name]
   (db/execute!
     (:url db-config)
     [(str "DROP TABLE IF EXISTS " table-name ";")]))
 
 (defn create-table!
   "Creates a table on the DB specified in the config hash"
-  [table-name columns]
+  [db-config table-name columns]
    (db/execute!
      (:url db-config)
      [(create-table-sql table-name columns)]))
@@ -82,16 +82,16 @@
    and destruction of a table depending on whether :up or :down
    is passed to it"
   [table-name columns]
-  (fn [symbol]
+  (fn [db-config symbol]
     (cond
      (= :up symbol)
-       (create-table! table-name columns)
+       (create-table! db-config table-name columns)
      (= :down symbol)
-       (drop-table! table-name))))
+       (drop-table! db-config table-name))))
 (defn remove-column!
   "Removes a column from the table with table-name on the
    DB specified in the config hash"
-  [table-name column-name]
+  [db-config table-name column-name]
   (db/execute!
    (:url db-config)
    [(str "ALTER TABLE " table-name " DROP COLUMN " (name column-name))]))
@@ -99,7 +99,7 @@
 (defn add-column!
   "Adds a column to the table with table-name on the DB
    specified in the config hash"
-  [table-name column]
+  [db-config table-name column]
   (db/execute!
    (:url db-config)
     [(add-column-sql table-name column)]))
@@ -108,10 +108,10 @@
   "Generates a function which chooses between the addition 
    and removal of a table depending on whether :up or :down
    is passed to it"
-  [table-name column]
-  (fn [symbol]
+  [db-config table-name column]
+  (fn [db-config symbol]
     (cond
      (= :up symbol)
-       (add-column! table-name column)
+       (add-column! db-config table-name column)
      (= :down symbol)
-       (remove-column! table-name (first column)))))
+       (remove-column! db-config table-name (first column)))))
