@@ -6,7 +6,7 @@
 
 (defn current-timestamp
   "Grabs the latest timestamp in the database"
-  []
+  [db-config]
   (or 
    (:timestamp
     (first
@@ -29,47 +29,59 @@
   "Grabs all migration file paths which have not yet been run by checking
    for the most recently ran migration's timestamp in the migrations table
    and returning all migrations which have a timestamp which is greater"
-  []
+  [db-config]
   (filter #(> (get-timestamp %)
-              (or (current-timestamp) 0))
+              (or (current-timestamp db-config) 0))
           (migrations)))
 
 (defn delete-timestamp!
   "Removes a given timestamp from the migrations database table"
-  [timestamp]
+  [db-config timestamp]
   (db/execute!
    (:url db-config)
    ["DELETE FROM malachite_migrations WHERE malachite_migrations.timestamp = ?;" timestamp]))
 
 (defn write-timestamp!
   "Writes the timestamp to the database when the migration has been handled"
-  [timestamp]
+  [db-config timestamp]
   (db/execute!
    (:url db-config)
    ["INSERT INTO malachite_migrations (timestamp) VALUES(?);" timestamp]))
 
+(defn current-timestamp
+  "Grabs the latest timestamp in the database"
+  [db-config]
+  (or 
+   (:timestamp
+    (first
+     (db/query
+      (:url db-config)
+      ["SELECT * FROM malachite_migrations
+        ORDER BY timestamp DESC LIMIT 1;"])))
+   0))
+
 (defn migrate!
   "Runs all migrations created after the latest timestamp in the database"
-  []
-  (let [ct (or (current-timestamp) 0)
-        pending-migrations (pending-migrations)]
+  [db-config]
+  (let [ct (or (current-timestamp db-config) 0)
+        pending-migrations (pending-migrations db-config)]
     (if-not (empty? pending-migrations)
       ; run all migrations; if they succeed, write the timestamp to the database
       (doseq [mig pending-migrations]
-        ((load-file mig) :up)
-        (write-timestamp! (get-timestamp mig)))
+        ((load-file mig) db-config :up)
+        (write-timestamp! db-config (get-timestamp mig)))
       (println "No pending migrations."))))
 
 (defn rollback!
   "Undoes the latest migration and removes that timestamp from the database"
-  []
-  (let [ct (current-timestamp)]
+  [db-config]
+  (let [ct (current-timestamp db-config)]
     (cond
      (nil? ct)
      nil
      (not (nil? ct))
-     (do ((load-file (migration ct)) :down)
-         (delete-timestamp! ct)))))
+     (do ((load-file (migration ct)) db-config :down)
+         (delete-timestamp! db-config ct)))))
 
 (defn migrate-to!
   "Runs all migrations between the latest timestamp in the d

@@ -6,18 +6,23 @@
             [malachite-migrations.db :refer :all]
             [malachite-migrations.core :refer :all]))
 
-(delete-all-migrations!)
+(def db-config 
+  {
+   :url "jdbc:postgresql://localhost/test-migrations"
+   })
+
+(delete-all-migrations! db-config)
 ;; Test reading and writing of timestamps to the migrations table
-(write-timestamp! 100)
-(write-timestamp! 101)
+(write-timestamp! db-config 100)
+(write-timestamp! db-config 101)
 
-(let [ct (current-timestamp)]
+(let [ct (current-timestamp db-config)]
   (expect 101 ct))
-(delete-timestamp! 101)
+(delete-timestamp! db-config 101)
 
-(let [ct (current-timestamp)]
+(let [ct (current-timestamp db-config)]
   (expect 100 ct))
 
-(delete-timestamp! 100)
+(delete-timestamp! db-config 100)
 
-(expect (= 0 (current-timestamp)))
+(expect (= 0 #spy/p (current-timestamp db-config)))

@@ -6,26 +6,30 @@
             [malachite-migrations.db :refer :all]
             [malachite-migrations.core :refer :all]))
 
+(def db-config 
+  {
+   :url "jdbc:postgresql://localhost/test-migrations"
+   })
 
-(write-migrations-table!)
+(write-migrations-table! db-config)
 
 ;; When there are no migrations, migrate should return nil and not fail
-(expect nil (migrate!))
+(expect nil (migrate! db-config))
 
 (let [fpath (generate-migration "create_users"
                                 "users_mng"
                                 :create-table
                                 [:id :integer]
                                 [:name :string])] 
-  (migrate!)
-  (expect (=  (count (pending-migrations)) 0))
+  (migrate! db-config)
+  (expect (=  (count (pending-migrations db-config)) 0))
   (delete-file fpath))
 
-(let [ct (current-timestamp)]
+(let [ct (current-timestamp db-config)]
 ;  the current timestamp should be a number
   (expect (number? ct))
   (expect (> ct 0))
-  (delete-timestamp! ct))
+  (delete-timestamp! db-config ct))
 
 (let [fpath (generate-migration "create_users_mig_mng"
                                 "users_mig_mng"
@@ -37,19 +41,19 @@
                                 :create-table
                                 [:id :integer]
                                 [:name :string])]
-  (migrate!)
+  (migrate! db-config)
   ;; migrate! should create both tables
-(let [ct (current-timestamp)]
+(let [ct (current-timestamp db-config)]
 ;  the current timestamp should be a number
   (expect (number? ct))
   (expect (> ct 0)))
-  (delete-all-migrations!)
-  (delete-file fpath)
-  (delete-file fpath1))
+(delete-all-migrations! db-config)
+(delete-file fpath)
+(delete-file fpath1))
 
 (defn clean-up-mng-test
   {:expectations-options :after-run}
   []
-  (drop-table! "users_mng")
-  (drop-table! "users_mig_mng")
-  (drop-table! "users_mig_mng1"))
+  (drop-table! db-config "users_mng")
+  (drop-table! db-config "users_mig_mng")
+  (drop-table! db-config "users_mig_mng1"))
