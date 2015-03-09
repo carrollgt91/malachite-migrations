@@ -16,7 +16,7 @@
 ;; When there are no migrations, migrate should return nil and not fail
 (expect nil (migrate! db-config))
 
-(let [fpath (generate-migration "create_users"
+(let [fpath (generate-migration! "create_users"
                                 "users_mng"
                                 :create-table
                                 [:id :integer]
@@ -31,12 +31,12 @@
   (expect (> ct 0))
   (delete-timestamp! db-config ct))
 
-(let [fpath (generate-migration "create_users_mig_mng"
+(let [fpath (generate-migration! "create_users_mig_mng"
                                 "users_mig_mng"
                                 :create-table
                                 [:id :integer]
                                 [:name :string])
-      fpath1 (generate-migration "create_users_mig_mng1"
+      fpath1 (generate-migration! "create_users_mig_mng1"
                                 "users_mig_mng1"
                                 :create-table
                                 [:id :integer]

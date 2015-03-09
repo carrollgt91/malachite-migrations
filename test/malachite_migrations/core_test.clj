@@ -7,7 +7,7 @@
 
 ; generating a migration should create a clojure file with some valid clojure
 ; code within
-(let [fpath (generate-migration "create_users"
+(let [fpath (generate-migration! "create_users"
                     "users" 
                     :create-table [:id :integer]
                                   [:name :string])
@@ -22,7 +22,7 @@
 ; throw an error and not generate a file
 
 (expect AssertionError 
-        (generate-migration "create_users"
+        (generate-migration! "create_users"
                             "users" 
                             [:id :integer]
                             [:name :string]))
