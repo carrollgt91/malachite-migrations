@@ -14,6 +14,17 @@
                     table_name = '" table-name "'
                 );")]))))
 
+(defn index-exists?
+  "Checks whether a given index exists"
+  [db-config index-name]
+  (:exists (first (db/query
+                   (:url db-config)
+                   [(str "SELECT EXISTS (
+SELECT 1
+FROM pg_class c
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE c.relname = '" index-name "');")]))))
+
 (defn write-migrations-table!
   "Creates the malachite-migrations table on the database if it doesn't exist"
   [db-config]
