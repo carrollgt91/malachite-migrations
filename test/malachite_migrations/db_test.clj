@@ -36,6 +36,18 @@
 (expect (add-column! db-config "users_db" [:email :string]))
 (expect (column-exists? db-config "users_db" "email") true)
 
+(expect (add-index! db-config "users_db" [:email]))
+(expect (index-exists? db-config "users_db_email_idx") true)
+(expect (remove-index! db-config "users_db" [:email]))
+(expect (index-exists? db-config "users_db_email_idx") false)
+
+;; index functionality using the :up :down wrapper
+(let [add-users-db-email-idx (add-index "users_db" [:email])]
+  (expect (add-users-db-email-idx db-config :up))
+  (expect (index-exists? db-config "users_db_email_idx") true)
+  (expect (add-users-db-email-idx db-config :down))
+  (expect (index-exists? db-config "users_db_email_idx") false))
+
 
 (expect (remove-column! db-config "users_db" :email))
 (expect (column-exists? db-config "users_db" "email") false)

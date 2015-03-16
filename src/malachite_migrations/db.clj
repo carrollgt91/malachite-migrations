@@ -1,5 +1,6 @@
 (ns malachite-migrations.db
-    (:require [clojure.java.jdbc :as db]))
+    (:require [clojure.java.jdbc :as db])
+    (:require [clojure.string :refer [join]]))
 
 ;; (def db-config 
 ;;   {
@@ -46,7 +47,7 @@
     (first
      (db/query
       (:url db-config)
-      [#spy/p (str "SELECT column_name " 
+      [(str "SELECT column_name " 
                    "FROM information_schema.columns " 
                    "WHERE table_name='" table-name
                    "' and column_name='" col-name "';")])))))
@@ -88,6 +89,7 @@
        (create-table! db-config table-name columns)
      (= :down symbol)
        (drop-table! db-config table-name))))
+
 (defn remove-column!
   "Removes a column from the table with table-name on the
    DB specified in the config hash"
@@ -104,9 +106,9 @@
    (:url db-config)
     [(add-column-sql table-name column)]))
 
-(defn add-column 
+(defn add-column
   "Generates a function which chooses between the addition 
-   and removal of a table depending on whether :up or :down
+   and removal of a column depending on whether :up or :down
    is passed to it"
   [db-config table-name column]
   (fn [db-config symbol]
@@ -114,4 +116,46 @@
      (= :up symbol)
        (add-column! db-config table-name column)
      (= :down symbol)
-       (remove-column! db-config table-name (first column)))))
+       (remove-column! db-config table-name column))))
+
+(defn add-index!
+  "Executes a command adding an index to a table on the
+   database specified in the config hash. See 
+   http://www.postgresql.org/docs/9.1/static/sql-createindex.html
+   for information on index-config options.
+   Include all configuration options that are flags, or have simple
+   defaults so the they can be included without any conditional logic."
+  ([db-config table-name column-keywords {:keys [unique concurrently index-name method] :or {method "BTREE"} :as index-config}]
+  (let [column-names (map #(name %1) column-keywords)]
+    (db/execute!
+      (:url db-config)
+      [(str "CREATE " unique  " INDEX " concurrently index-name  " ON " table-name " USING " method  " ("  (clojure.string/join ", "  column-names) ");")])))
+  ([db-config table-name column-keywords]
+  (add-index! db-config table-name column-keywords {})))
+
+(defn remove-index!
+  "Executes a command removing an index to a table on the
+   database specified in the config hash. Naively assumes that
+   only one index has been created and deletes that first index"
+  ([db-config table-name column-keywords {:keys [unique concurrently index-name  method] :or {method "BTREE"} :as index-config}]
+  (let [ column-names (map #(name %1) column-keywords)
+        index-name (or index-name (str table-name "_" (clojure.string/join "_" column-names) "_idx"))]
+    (db/execute!
+     (:url db-config)
+     [(str "DROP INDEX " index-name ";")])))
+  ([db-config table-name column-keywords]
+  (remove-index! db-config table-name column-keywords {})))
+
+(defn add-index
+   "Generates a function which chooses between the creation
+   and destruction of an index depending on whether :up or :down
+   is passed to it"
+   ([table-name column-keywords index-config]
+   (fn [db-config symbol]
+    (cond
+     (= :up symbol)
+       (add-index! db-config table-name column-keywords index-config)
+     (= :down symbol)
+       (remove-index! db-config table-name column-keywords index-config))))
+   ([table-name column-keywords]
+    (add-index table-name column-keywords {})))
